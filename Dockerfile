@@ -5,7 +5,7 @@ RUN go mod download
 COPY *.go ./
 COPY metrics/ metrics/
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /discord-prometheus
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/discord-prometheus
 
 FROM alpine:latest
 COPY --from=builder /app/discord-prometheus .
