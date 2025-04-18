@@ -1,20 +1,14 @@
-FROM golang:1.24-alpine AS builder
+FROM golang:latest AS builder
 WORKDIR /app
-COPY . .
-RUN apk --no-cache add --no-check-certificate ca-certificates \
-   && update-ca-certificates
-RUN \
-   --mount=type=cache,target=/go/pkg \
-   --mount=type=cache,target=/root/.cache/go-build \
-   CGO_ENABLED=0 go build -o discord-prometheus .
+COPY go.mod go.sum ./
+RUN go mod download
+COPY *.go ./
 
-FROM scratch
-RUN apk --no-cache add --no-check-certificate ca-certificates \
-   && update-ca-certificates
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /ca-certificates.crt
-COPY --from=builder /etc/ssl/certs/ca-bundle.crt /etc/ssl/certs/ca-bundle.crt
-COPY --from=builder /app/discord-prometheus /
-ENV MECTRICS_PORT=9090
-EXPOSE ${MECTRICS_PORT}
-ENTRYPOINT ["/discord-prometheus", "live"]
+RUN RUN CGO_ENABLED=0 GOOS=linux go build -o /discord-prometheus
+
+FROM alpine:latest
+COPY --from=builder /app/discord-prometheus .
+
+EXPOSE 9090
+CMD ["/discord-prometheus", "live"]
 LABEL org.opencontainers.image.source="https://github.com/AkovStohs/discord-prometheus"
