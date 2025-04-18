@@ -9,6 +9,8 @@ RUN \
    CGO_ENABLED=0 go build -o discord-prometheus .
 
 FROM scratch
+RUN apk --no-cache add --no-check-certificate ca-certificates \
+   && update-ca-certificates
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /ca-certificates.crt
 COPY --from=builder /etc/ssl/certs/ca-bundle.crt /etc/ssl/certs/ca-bundle.crt
 COPY --from=builder /app/discord-prometheus /
