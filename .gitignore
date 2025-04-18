@@ -1,0 +1,4 @@
+.vscode/
+.idea/
+/discord-prometheus
+.discord_token

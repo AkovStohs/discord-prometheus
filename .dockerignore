@@ -1,0 +1,7 @@
+*.png
+*.md
+.github/
+.discord_token
+.env
+*.log
+
